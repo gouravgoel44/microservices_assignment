@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aggregator
+  labels:
+    app: aggregator
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aggregator
+  template:
+    metadata:
+      labels:
+        app: aggregator
+    spec:
+      containers:
+      - name: aggregator
+        image: gouravgoel44/aggregator-service:latest
+        ports:
+        - containerPort: 8282
+        env:
+        - name: JAEGER_HOST
+          value: jaeger-service-cluster
+        - name: USER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: user-service-url
+        - name: ORDER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: order-service-url              
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggregator-service
+  labels:
+    app: aggregator-service
+spec:
+  ports:
+  - port: 8282
+    protocol: TCP
+  selector:
+    app: aggregator
+  type: LoadBalancer

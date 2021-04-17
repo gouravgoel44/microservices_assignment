@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: gouravgoel44/order-service:latest
+        ports:
+        - containerPort: 8181
+        env:
+        - name: JAEGER_HOST
+          value: jaeger-service-cluster
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  labels:
+    app: order-service
+spec:
+  ports:
+  - port: 8181
+    protocol: TCP
+  selector:
+    app: order
+  type: ClusterIP

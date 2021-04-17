@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  database-name: nagp
+  user-service-url: http://user-service:8080
+  order-service-url: http://order-service:8181
